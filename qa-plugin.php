@@ -312,8 +312,8 @@
 	}
 	
 	function qa_badge_name($slug) {
-		$name = qa_opt('badge_'.$slug.'_name')?qa_opt('badge_'.$slug.'_name'):qa_lang('badges/'.$slug);
-		
+//		$name = qa_opt('badge_'.$slug.'_name')?qa_opt('badge_'.$slug.'_name'):qa_lang('badges/'.$slug);
+$name=qa_lang('badges/'.$slug);
 		// plugins
 		
 		if($name == '[badges/'.$slug.']') {
@@ -495,7 +495,7 @@
 								<tr>
 									<td class="badge-container">
 										<div class="badge-container-badge">
-											<span class="badge-'.$types.'" title="'.$desc.' ('.$typed.')">'.qa_html($name).'</span>&nbsp;<span onclick="jQuery(\'.badge-container-sources-'.$slug.'\').slideToggle()" class="badge-count'.(is_array($oids)?' badge-count-link" title="'.qa_lang('badges/badge_count_click'):'').'">x&nbsp;'.$count.'</span>
+											<span class="badgetooltip badge-'.$types.'" title="'.$desc.' ('.$typed.')">'.qa_html($name).'</span>&nbsp;<span onclick="jQuery(\'.badge-container-sources-'.$slug.'\').slideToggle()" class="badge-count'.(is_array($oids)?' badge-count-link" title="'.qa_lang('badges/badge_count_click'):'').'">x&nbsp;'.$count.'</span>
 										</div>';
 						
 						// source row(s) if any	
