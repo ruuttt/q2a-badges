@@ -4,13 +4,13 @@
         Plugin Name: Badges
         Plugin URI: https://github.com/NoahY/q2a-badges
         Plugin Description: Awards Badges
-        Plugin Version: 4.0
+        Plugin Version: 4.8
         Plugin Date: 2011-07-30
         Plugin Author: NoahY
         Plugin Author URI: 
         Plugin License: GPLv3+
         Plugin Minimum Question2Answer Version: 1.5
-		Plugin Update Check URI: https://github.com/NoahY/q2a-badges/raw/master/qa-plugin.php
+		Plugin Update Check URI: https://raw.github.com/NoahY/q2a-badges/master/qa-plugin.php
 */
 
 
@@ -222,7 +222,7 @@
 							qa_db_query_sub(
 								'INSERT INTO ^eventlog (datetime, ipaddress, userid, handle, cookieid, event, params) '.
 								'VALUES (NOW(), $, $, $, #, $, $)',
-								qa_remote_ip_address(), $uid, $handle, qa_cookie_get_create(), 'badge_awarded', 'badge_slug='.$badge_slug.($oid?"\t".'postid='.$oid:'')
+								qa_remote_ip_address(), $uid, $handle, qa_cookie_get(), 'badge_awarded', 'badge_slug='.$badge_slug.($oid?"\t".'postid='.$oid:'')
 							);
 						}
 					}
@@ -529,7 +529,7 @@ $name=qa_lang('badges/'.$slug);
 								$output .= '
 											<div class="badge-source"><a href="'.qa_path_html(qa_q_request($oid,$title),NULL,qa_opt('site_url')).($anchor?'#'.$anchor:'').'">'.qa_html($text).'</a></div>';
 							}
-							
+							$output .= '</div>';
 						}
 						$output .= '
 									</td>

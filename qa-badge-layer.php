@@ -124,6 +124,9 @@
 			if(!qa_opt('badge_active'))
 				return;
 
+			if (qa_opt('badge_active') && $this->template != 'admin')
+				$this->badge_notify();
+
 			if ($this->request == 'admin/plugins' && qa_get_logged_in_level() >= QA_USER_LEVEL_ADMIN) {
 				$this->output("
 				<script>".(qa_opt('badge_notify_time') != '0'?"
@@ -141,17 +144,20 @@
 					}
 				</script>");
 			}
+			else if (isset($this->badge_notice)) {
+				$this->output("
+				<script>".(qa_opt('badge_notify_time') != '0'?"
+					jQuery('document').ready(function() { jQuery('.notify-container').delay(".((int)qa_opt('badge_notify_time')*1000).").slideUp('fast'); });":"")."
+				</script>");
+			}
 			$this->output('<style>',qa_opt('badges_css'),'</style>');
 		}
 
 		function body_prefix()
 		{
 			qa_html_theme_base::body_prefix();
-			
-			if (qa_opt('badge_active') && $this->template != 'admin') {
-				$this->badge_notify();
-			}
-			
+			if(isset($this->badge_notice))
+				$this->output($this->badge_notice);
 		}
 
 		function body_suffix()
@@ -182,12 +188,21 @@
 
 		function post_meta_who($post, $class)
 		{
-			if (qa_opt('badge_active') && (bool)qa_opt('badge_admin_user_widget') && ($class != 'qa-q-item' || qa_opt('badge_admin_user_widget_q_item')) ) {
-				$handle = strip_tags($post['who']['data']);
+			if (@$post['who'] && @$post['who']['data'] && qa_opt('badge_active') && (bool)qa_opt('badge_admin_user_widget') && ($class != 'qa-q-item' || qa_opt('badge_admin_user_widget_q_item')) ) {
+				$handle = preg_replace('|.+qa-user-link" title="@([^"]+)".+|','$1',$post['who']['data']);
 				$post['who']['suffix'] = (@$post['who']['suffix']).'&nbsp;'.qa_badge_plugin_user_widget($handle);
 			}
 			
 			qa_html_theme_base::post_meta_who($post, $class);
+		}
+
+		function logged_in()
+		{
+			if (qa_opt('badge_active') && (bool)qa_opt('badge_admin_loggedin_widget') && @$this->content['loggedin']['data'] != null) {
+				$handle = preg_replace('|.+qa-user-link" title="@([^"]+)".+|','$1',$this->content['loggedin']['data']);
+				$this->content['loggedin']['data'] = $this->content['loggedin']['data'].'&nbsp;'.qa_badge_plugin_user_widget($handle);
+			}
+			qa_html_theme_base::logged_in();
 		}
 		
 		function q_view_main($q_view) {
@@ -302,14 +317,14 @@
 					'UPDATE ^userbadges SET notify=0 WHERE user_id=# AND notify>=1',
 					$userid
 				);
-				$this->output($notice);
+				$this->badge_notice = $notice;
 			}
 		}
 
 	// etc
 		
 		function trigger_notify($message) {
-			$notice = '<div class="notify-container"><div class="badge-notify notify">'.qa_lang('badges/badge_notify')."'".$message.'\'!&nbsp;&nbsp;'.qa_lang('badges/badge_notify_profile_pre').'<a href="/user/'.qa_get_logged_in_handle().'">'.qa_lang('badges/badge_notify_profile').'</a><div class="notify-close" onclick="jQuery(this).parent()..slideUp()">x</div></div></div>';
+			$notice = '<div class="notify-container"><div class="badge-notify notify">'.qa_lang('badges/badge_notify')."'".$message.'\'!&nbsp;&nbsp;'.qa_lang('badges/badge_notify_profile_pre').'<a href="/user/'.qa_get_logged_in_handle().'">'.qa_lang('badges/badge_notify_profile').'</a><div class="notify-close" onclick="jQuery(this).parent().parent().slideUp()">x</div></div></div>';
 			$this->output($notice);
 		}
 		
